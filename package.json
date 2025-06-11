@@ -18,7 +18,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
-    "express-rate-limit": "^7.5.0",
     "firebase": "^11.6.0",
     "firebase-admin": "^13.2.0",
     "lucide-react": "^0.485.0",
