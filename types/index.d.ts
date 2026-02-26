@@ -23,6 +23,7 @@ interface Interview {
   userId: string;
   type: string;
   finalized: boolean;
+  passmark?: number;
 }
 
 interface CreateFeedbackParams {
@@ -36,6 +37,7 @@ interface User {
   name: string;
   email: string;
   id: string;
+  role?: "admin" | "candidate";
 }
 
 interface InterviewCardProps {
@@ -54,6 +56,7 @@ interface AgentProps {
   feedbackId?: string;
   type: "generate" | "interview";
   questions?: string[];
+  redirectTo?: string;
 }
 
 interface RouteParams {
@@ -81,6 +84,27 @@ interface SignUpParams {
   name: string;
   email: string;
   password: string;
+  role?: "admin" | "candidate";
+}
+
+interface CreateAdminInterviewParams {
+  adminId: string;
+  role: string;
+  level: string;
+  type: string;
+  techstack: string;
+  amount: number;
+  passmark: number;
+  jobDescription?: string;
+}
+
+interface CandidateResult {
+  feedbackId: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  totalScore: number;
+  createdAt: string;
 }
 
 type FormType = "sign-in" | "sign-up";

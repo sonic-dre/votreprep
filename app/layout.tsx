@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Mona_Sans } from "next/font/google";
+import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
-const monaSans = Mona_Sans({
-  variable: "--font-mona-sans",
+const syne = Syne({
   subsets: ["latin"],
+  variable: "--font-syne",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
 
 export const metadata: Metadata = {
   title: "VotrePrep",
@@ -20,12 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${monaSans.className} antialiased pattern`}
-      >
+    <html lang="en">
+      <body className={`${syne.variable} ${dmSans.variable} antialiased`}>
         {children}
-        <Toaster />
+        <Toaster theme="dark" />
       </body>
     </html>
   );

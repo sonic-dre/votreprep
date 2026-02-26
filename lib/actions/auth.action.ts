@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60*60*24*7;
 
 export async function signUp(params: SignUpParams){
-    const {uid, name, email} = params;
+    const {uid, name, email, role} = params;
 
     try {
         const userRecord = await db.collection("users").doc(uid).get();
@@ -15,12 +15,12 @@ export async function signUp(params: SignUpParams){
         if(userRecord.exists){
             return{
                 success: false,
-                message: "User alredy exists, Please sign in instead" 
+                message: "User alredy exists, Please sign in instead"
             }
         }
 
         await db.collection('users').doc(uid).set({
-            name, email
+            name, email, role: role ?? "candidate"
         })
 
         return{
@@ -114,5 +114,10 @@ export async function getCurrentUser() : Promise<User | null> {
 export async function isAuthenticated(){
     const user = await getCurrentUser();
 
-    return !!user; //true 
+    return !!user; //true
+}
+
+export async function signOutAction() {
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
 }

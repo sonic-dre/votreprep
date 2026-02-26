@@ -1,23 +1,29 @@
-import { isAuthenticated } from '@/lib/actions/auth.action'
-import Image from 'next/image'
-import Link from 'next/link'
+import { getCurrentUser, isAuthenticated } from '@/lib/actions/auth.action'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
+import Sidebar from '@/components/Sidebar'
 
-const RootLayout = async ({children}: {children:ReactNode}) => {
-
+const RootLayout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
-  if(!isUserAuthenticated) redirect('/sign-in')
-  return (
-    <div className="root-layout">
-      <nav>
-        <Link href="/" className='flex items-center gap-2'>
-          <Image src="/logo.png" alt='Logo' width={400} height={150} />
-        </Link>
-      </nav>
-      {children}
-    </div>
-  )
-}
+  if (!isUserAuthenticated) redirect('/sign-in');
 
-export default RootLayout
+  const user = await getCurrentUser();
+  if (user?.role === 'admin') redirect('/admin');
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar userName={user?.name} />
+      <main style={{
+        marginLeft: 220,
+        flex: 1,
+        padding: "36px 40px",
+        maxWidth: "calc(100vw - 220px)",
+        minHeight: "100vh",
+      }}>
+        {children}
+      </main>
+    </div>
+  );
+};
+
+export default RootLayout;
