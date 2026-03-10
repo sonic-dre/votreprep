@@ -57,7 +57,7 @@ const NewInterviewClient = ({ userId, userName }: { userId: string; userName: st
       if (result.success && result.interviewId) {
         router.push(`/admin/interviews/${result.interviewId}`);
       } else {
-        setError("Failed to generate interview. Please try again.");
+        setError(`Failed to generate interview: ${(result as any).error ?? "Unknown error"}`);
       }
     } catch {
       setError("Something went wrong. Please try again.");

@@ -57,8 +57,9 @@ export async function createAdminInterview(params: CreateAdminInterviewParams) {
 
     return { success: true, interviewId: doc.id };
   } catch (error) {
-    console.error("Error creating admin interview:", error);
-    return { success: false, interviewId: null };
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Error creating admin interview:", message);
+    return { success: false, interviewId: null, error: message };
   }
 }
 
