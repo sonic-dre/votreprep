@@ -1,9 +1,30 @@
 "use server";
 
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { db } from "@/firebase/admin";
 import { getRandomInterviewCover } from "@/lib/utils";
+
+async function generateWithGroq(prompt: string): Promise<string> {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Groq API error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
+}
 
 export async function createAdminInterview(params: CreateAdminInterviewParams) {
   const { adminId, role, level, type, techstack, amount, passmark, jobDescription } = params;
@@ -13,9 +34,7 @@ export async function createAdminInterview(params: CreateAdminInterviewParams) {
     : "";
 
   try {
-    const { text: questions } = await generateText({
-      model: google("gemini-2.0-flash-001"),
-      prompt: `Prepare questions for a job interview.
+    const questions = await generateWithGroq(`Prepare questions for a job interview.
         The job role is ${role}.
         The job experience level is ${level}.
         The key tools and skills relevant to the role are: ${techstack}.
@@ -25,8 +44,7 @@ export async function createAdminInterview(params: CreateAdminInterviewParams) {
         The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
         Return the questions formatted like this:
         ["Question 1", "Question 2", "Question 3"]
-      `,
-    });
+      `);
 
     let parsedQuestions: string[] = [];
     try {

@@ -1,7 +1,28 @@
 import { db } from "@/firebase/admin";
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
+
+async function generateWithGroq(prompt: string): Promise<string> {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Groq API error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,14 +97,11 @@ async function saveInterview(params: {
     : [];
 
   try {
-    const { text } = await generateText({
-      model: google("gemini-2.0-flash-001"),
-      prompt: `Generate ${questionCount} interview questions for a ${level} ${role} position.
+    const text = await generateWithGroq(`Generate ${questionCount} interview questions for a ${level} ${role} position.
 Interview type: ${type}.
 ${techList.length ? `Focus on these technologies: ${techList.join(", ")}.` : ""}
 Return ONLY a valid JSON array of question strings, nothing else.
-Example: ["Question 1?", "Question 2?"]`,
-    });
+Example: ["Question 1?", "Question 2?"]`);
 
     let questions: string[] = [];
     try {
