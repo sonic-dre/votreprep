@@ -8,14 +8,12 @@ import { generateObject } from "ai";
 export async function getInterviewByUserId(userId: string) : Promise<Interview[] | null> {
     const interviews = await db
     .collection('interviews')
-    .where('userId', '==', userId )
-    .orderBy('createdAt', 'desc')
+    .where('userId', '==', userId)
     .get();
 
-    return interviews.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-    })) as Interview[];
+    return interviews.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }) as Interview)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 

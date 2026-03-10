@@ -85,10 +85,11 @@ export async function getAdminInterviews(adminId: string): Promise<Interview[]> 
   const snap = await db
     .collection("interviews")
     .where("userId", "==", adminId)
-    .orderBy("createdAt", "desc")
     .get();
 
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Interview[];
+  return snap.docs
+    .map((doc) => ({ id: doc.id, ...doc.data() }) as Interview)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function getInterviewCandidates(interviewId: string): Promise<CandidateResult[]> {
