@@ -1,5 +1,5 @@
 import InterviewCard from '@/components/InterviewCard';
-import { getInterviewByUserId, getLatestInterviews } from '@/lib/actions/general.action';
+import { getInterviewByUserId } from '@/lib/actions/general.action';
 import { getCurrentUser } from '@/lib/actions/auth.action';
 import Link from 'next/link';
 
@@ -31,11 +31,7 @@ const StatCard = ({ label, value, color, icon }: { label: string; value: string;
 const page = async () => {
   const user = await getCurrentUser();
 
-  const [userInterviews, latestInterviews] = await Promise.all([
-    getInterviewByUserId(user?.id!),
-    getLatestInterviews({ userId: user?.id! }),
-  ]);
-
+  const userInterviews = await getInterviewByUserId(user?.id!);
   const totalInterviews = userInterviews?.length ?? 0;
 
   return (
@@ -55,12 +51,9 @@ const page = async () => {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 36 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16, marginBottom: 36 }}>
         <StatCard label="Total Interviews" value={String(totalInterviews)} color="var(--accent)"
           icon={<svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>}
-        />
-        <StatCard label="Interviews Available" value={String(latestInterviews?.length ?? 0)} color="var(--accent2)"
-          icon={<svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>}
         />
         <StatCard label="Community Members" value="1.2k+" color="var(--accent3)"
           icon={<svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
@@ -120,19 +113,6 @@ const page = async () => {
             </Link>
           </div>
 
-          {/* Community interviews */}
-          {(latestInterviews?.length ?? 0) > 0 && (
-            <div style={{ marginTop: 20 }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, marginBottom: 14, color: "var(--muted-foreground)", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                Community Picks
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {latestInterviews?.slice(0, 3).map((interview) => (
-                  <InterviewCard {...interview} key={interview.id} userId={user?.id} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
