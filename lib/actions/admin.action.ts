@@ -28,12 +28,24 @@ export async function createAdminInterview(params: CreateAdminInterviewParams) {
       `,
     });
 
+    let parsedQuestions: string[] = [];
+    try {
+      const match = questions.match(/\[[\s\S]*\]/);
+      parsedQuestions = match ? JSON.parse(match[0]) : JSON.parse(questions);
+    } catch {
+      parsedQuestions = questions
+        .split("\n")
+        .map((l) => l.replace(/^[-\d.)\s]+/, "").trim())
+        .filter((l) => l.length > 0)
+        .slice(0, amount);
+    }
+
     const interview = {
       role,
       type,
       level,
       techstack: techstack.split(",").map((s) => s.trim()).filter(Boolean),
-      questions: JSON.parse(questions),
+      questions: parsedQuestions,
       userId: adminId,
       passmark,
       finalized: true,
