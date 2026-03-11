@@ -133,7 +133,7 @@ const Agent = ({ userName, userId, interviewId, feedbackId, type, questions, red
           undefined,
           undefined,
           process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!,
-          { variableValues: { userName, userId } }
+          { variableValues: { username: userName, userid: userId } }
         );
       } else {
         const formattedQuestions = questions?.map((q) => `- ${q}`).join("\n") ?? "";
